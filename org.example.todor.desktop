@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Todor
+Exec=todor
+Icon=kde
+Type=Application
+Termianl=false
+Categories=Utility
