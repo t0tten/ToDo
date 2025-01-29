@@ -28,6 +28,7 @@ Kirigami.AbstractCard {
                 checked: finished == "true" ? true : false
                 onClicked: updateFinishedTasks(index)
                 padding: 0
+                visible: (index != -1) ? true : false
             }
 
             ColumnLayout {
@@ -38,18 +39,18 @@ Kirigami.AbstractCard {
                     Layout.fillWidth: true
                     font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                     focus: task == "" ? true : false
-                    onFocusChanged: focusHasChanged(index, focus, "task")
+                    onFocusChanged: focusHasChanged(index, focus, "task", isNew)
                     onAccepted: { taskField.focus = false; }
                     padding: 0
                 }
                 Controls.TextField {
                     id: noteField
-                    placeholderText: note.length > 0 ? note : taskField.focus == true ? "Add Note" : ""
+                    placeholderText: note != null && note.length > 0 ? note : taskField.focus == true ? "Add Note" : ""
                     Layout.fillWidth: true
-                    visible: (note.length > 0 || taskField.focus == true || noteField.focus == true)
+                    visible: ((note != null && note.length > 0) || taskField.focus == true || noteField.focus == true)
                     background: Rectangle { color: "transparent" }
                     font.pointSize: Kirigami.Theme.defaultFont.pointSize * 0.5
-                    onFocusChanged: focusHasChanged(index, focus, "note")
+                    onFocusChanged: focusHasChanged(index, focus, "note", isNew)
                     onAccepted: { noteField.focus = false; }
                     padding: 0
                 }
@@ -57,20 +58,25 @@ Kirigami.AbstractCard {
         }
     }
 
-    function focusHasChanged (index, focus, prop) {
+    function focusHasChanged (index, focus, prop, isNew) {
         if (focus) {
             if (prop == "task") {
                 taskField.text = taskField.placeholderText;
             } else if (prop == "note") {
                 noteField.text = noteField.placeholderText;
             }
+
+            if (index != 0 && isNew == "true") {
+                reminderModel.setProperty(index, "isNew", "false");
+            }
         } else {
-            updateValue(index, prop);
+            updateValue(index, prop, isNew);
         }
     }
 
-    function updateValue (index, prop) {
+    function updateValue (index, prop, isNew) {
         let value = "";
+
         if (prop == "task") {
             value = taskField.text;
             taskField.text = "";
@@ -80,10 +86,17 @@ Kirigami.AbstractCard {
             noteField.text = "";
             noteField.focus = false;
         }
-        if (value == "" && prop == "task") {
-            reminderModel.remove(index);
-        } else {
-            reminderModel.setProperty(index, prop, value);
+
+        if (index >= 0) {
+            if (value == "" && prop == "task" && isNew == "false") {
+                reminderModel.remove(index, 1);
+            } else {
+                reminderModel.setProperty(index, prop, value);
+            }
+
+            if (isNew == "true") {
+                reminderModel.setProperty(index, "isNew", "false");
+            }
         }
     }
 

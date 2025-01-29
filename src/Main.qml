@@ -10,20 +10,30 @@ Kirigami.ApplicationWindow {
 
     globalDrawer: Kirigami.GlobalDrawer {
         title: i18n("Reminders")
+
+        Controls.Button {
+            text: "Add new list"
+            Layout.alignment: Qt.AlignHCenter
+            icon.name: "list-add-symbolic"
+            onClicked: { console.log("Clicked!") }
+        }
+
         actions: [
             Kirigami.Action {
                 text: i18n("Groceries")
                 onTriggered: {
-                    reminderModel.clear();
+                    clearModel();
                     reminderModel.append({
                         task: "Test 1",
                         note: "",
-                        finished: "false"
+                        finished: "false",
+                        isNew: "true"
                     });
                     reminderModel.append({
                         task: "Test 2",
                         note: "This is not needed",
-                        finished: "true"
+                        finished: "true",
+                        isNew: "true"
                     });
                     setupReminder("Groceries");
                 }
@@ -31,11 +41,12 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: i18n("Programming")
                 onTriggered: {
-                    reminderModel.clear();
+                    clearModel();
                     reminderModel.append({
                         task: "Read these lists from file",
                         note: "",
-                        finished: "false"
+                        finished: "false",
+                        isNew: "true"
                     });
                     setupReminder("Programming");
                 }
@@ -43,21 +54,29 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: i18n("Reminders")
                 onTriggered: {
-                    reminderModel.clear();
+                    clearModel();
                     reminderModel.append({
                         task: "Feed cat",
                         note: "Use dry food",
-                        finished: "false"
+                        finished: "false",
+                        isNew: "true"
                     });
                     reminderModel.append({
                         task: "Wash clothes",
                         note: "",
-                        finished: "false"
+                        finished: "false",
+                        isNew: "true"
                     });
                     setupReminder("Reminders");
                 }
             }
         ]
+    }
+
+    function clearModel() {
+        for (var i = (reminderModel.count - 1); i >= 0; i--) {
+            reminderModel.remove(i, 1);
+        }
     }
 
     function setupReminder(reminderListName) {
@@ -101,10 +120,15 @@ Kirigami.ApplicationWindow {
                 text: i18nc("@action:button", "New reminder")
                 tooltip: i18n("Add new empty reminder")
                 onTriggered: {
+                    if (reminderModel.count > 0 && reminderModel.get(reminderModel.count - 1).task == "") {
+                        return;
+                    }
+
                     reminderModel.append({
                         task: "",
                         note: "",
-                        finished: "false"
+                        finished: "false",
+                        isNew: "true"
                     });
                 }
             }
@@ -123,6 +147,7 @@ Kirigami.ApplicationWindow {
                     let taskTextField = columnLayout.children[0];
 
                     if (taskTextField.placeholderText == "") {
+                        taskTextField.text = "";
                         taskTextField.forceActiveFocus();
                     }
                 }
