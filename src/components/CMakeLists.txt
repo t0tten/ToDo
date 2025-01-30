@@ -8,6 +8,7 @@ ecm_add_qml_module(todor-components
 ecm_target_qml_sources(todor-components
     SOURCES
     ItemsList.qml
+    AddList.qml
 )
 
 ecm_finalize_qml_module(todor-components)

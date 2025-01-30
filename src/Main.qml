@@ -9,13 +9,20 @@ Kirigami.ApplicationWindow {
     title: i18nc("@title:window", "ToDo:R")
 
     globalDrawer: Kirigami.GlobalDrawer {
+        id: globalDrawer
         title: i18n("Reminders")
+
+        AddList {
+            id: addListDialog
+        }
 
         Controls.Button {
             text: "Add new list"
             Layout.alignment: Qt.AlignHCenter
             icon.name: "list-add-symbolic"
-            onClicked: { console.log("Clicked!") }
+            onClicked: {
+                addListDialog.open();
+            }
         }
 
         actions: [
